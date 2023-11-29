@@ -6,7 +6,7 @@ from copy import deepcopy
 
 def calculateDet(delta):
         midA = [[1.05, 1],
-                [1, 0.95]]
+                [0.95, 1]]
         radA = [[delta, delta], [delta, delta]]
         A = ip.Interval(midA, radA, midRadQ=True)
         detA = A[0][0] * A[1][1] - A[1][0] * A[0][1]
@@ -22,26 +22,13 @@ def task1():
         detA = calculateDet(delta)
         detArrayHight.append(detA.b)
         detArrayLow.append(detA.a)
-
-    plt.figure()
-    plt.title("Task 1")
-
-    plt.grid()
-    plt.plot(deltaArray, detArrayHight, label = "det up border")
-    plt.plot(deltaArray, detArrayLow, label = "det down border")
-    plt.plot(0.000625, calculateDet(0.000625).b, 'b*', label = "delta = 0.000625")
-    plt.plot(np.linspace(0, 1, num=10), np.zeros(10), 'r--' )
-    plt.xlim(-0.0001, 0.0008)
-    plt.ylim(-0.004, 0.001)
-    plt.xlabel('delta')
-    plt.ylabel('det(A)')
-    plt.legend()
     
     plt.figure()
     plt.title("Task 1")
     plt.grid()
     plt.plot(deltaArray, detArrayHight, label = "det up border")
     plt.plot(deltaArray, detArrayLow, label = "det down border")
+    plt.plot(0.025, calculateDet(0.025).a, 'b*', label = "delta = 0.025")
     plt.xlabel('delta')
     plt.ylabel('det(A)')
     plt.legend()
@@ -59,9 +46,32 @@ def bauman(vertices):
     return True
 
 def task2():
-    A = np.array([[1.05, 1.0], [ 1.0, 0.95]])
-    deltas = np.linspace(0, 0.001, 1001)
-    for delta in deltas[620:630]:
+    A = np.array([[1.05, 0.95], [ 1.0, 1.0]])
+    
+    deltas = np.linspace(0.04, 0.06, 10)
+    # Регрессия
+    print("\nЗадача регрессии")
+    for delta in deltas:
+        A1 = A.copy()
+        A1[0][0] -= delta
+        A1[1][0] -= delta
+        A2 = A.copy()
+        A2[0][0] += delta
+        A2[1][0] -= delta
+        A3 = A.copy()
+        A3[0][0] += delta
+        A3[1][0] += delta
+        A4 = A.copy()
+        A4[0][0] -= delta
+        A4[1][0] += delta
+
+        verticesA = [A1, A2, A3, A4]
+        print("{:2.6f}\t{}".format(delta, "неособенная" if bauman(verticesA) else "особенная"))
+
+    # Томография
+    deltas = np.linspace(0.02, 0.029, 10)
+    print("\nЗадача томографии")
+    for delta in deltas:
         A1 = A.copy()
         A1[0][0] -= delta
         A1[0][1] -= delta
@@ -149,12 +159,12 @@ def task2():
         A16[1][1] += delta
 
         verticesA = [A1, A2, A3, A4, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16]
-        print("{:2.6f}\t{}".format(delta, "неособенная" if bauman(verticesA) else "особенная"))
+        print("{:2.5f}\t{}".format(delta, "неособенная" if bauman(verticesA) else "особенная"))
 
 
 def task3():
     midA = [[1.05, 1],
-            [1, 0.95]]
+            [0.95, 1]]
     U, S, V = np.linalg.svd(midA)
     print("Сингулярные числа " + str(S))
 
